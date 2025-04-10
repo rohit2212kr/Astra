@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Talk to Astra</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 40px;
+      color: #333;
+    }
+
+    /* Chat box */
+    #chat-box {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .message {
+      margin: 5px 0;
+    }
+
+    .user {
+      text-align: right;
+      color: blue;
+    }
+
+    .astra {
+      text-align: left;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Talk to Astra 👋</h1>
+
+  <!-- Live chat box -->
+  <div id="chat-box"></div>
+
+  <!-- Vapi script -->
+  <script>
+    const assistant = "efb226e8-0916-4510-bfa0-a3cd0d7e6514";
+    const apiKey = "c44a374b-68d2-4645-9863-c14cf335f22e";
+    const buttonConfig = {}; // optional customizations
+
+    function addMessage(role, text) {
+      const chatBox = document.getElementById("chat-box");
+      const msg = document.createElement("div");
+      msg.classList.add("message", role === "user" ? "user" : "astra");
+      msg.innerText = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    (function (d, t) {
+      const g = document.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+      g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g, s);
+
+      g.onload = function () {
+        const vapiInstance = window.vapiSDK.run({
+          apiKey: apiKey,
+          assistant: assistant,
+          config: buttonConfig,
+        });
+
+        // Handle transcription (user speaking)
+        vapiInstance.on("transcript", (data) => {
+          if (data.transcript) addMessage("user", data.transcript);
+        });
+
+        // Handle AI messages
+        vapiInstance.on("response", (data) => {
+          if (data.message) addMessage("astra", data.message);
+        });
+      };
+    })(document, "script");
+  </script>
+</body>
+</html>
